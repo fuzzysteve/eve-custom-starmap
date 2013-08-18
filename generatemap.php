@@ -9,6 +9,13 @@ if (isset($_SESSION['systemlabel']))
 {
     $systemlabel=$_SESSION['systemlabel'];
 }
+$regionlabel=0;
+if (isset($_SESSION['regionlabel']))
+{
+    $regionlabel=$_SESSION['regionlabel'];
+}
+
+
 $x=800;
 if (isset($_SESSION['mapx']))
 {
@@ -145,16 +152,17 @@ imagelinethick($im,(($row->x1-$minx)/$scalex)+$margin,(($row->y1-$miny)/$scaley)
 
 }
 
+if ($regionlabel)
+{
+    $labelsql="select regionname,x,z as y from mapRegions where x between :minx and :maxx and z between :miny and :maxy";
+    $stmt = $dbh->prepare($labelsql);
 
-$labelsql="select regionname,x,z as y from mapRegions where x between :minx and :maxx and z between :miny and :maxy";
-$stmt = $dbh->prepare($labelsql);
+    $stmt->execute(array(":minx"=>$minx,":miny"=>$miny,":maxx"=>$maxx,":maxy"=>$maxy));
 
-$stmt->execute(array(":minx"=>$minx,":miny"=>$miny,":maxx"=>$maxx,":maxy"=>$maxy));
-
-while ($row = $stmt->fetchObject()){
-imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin,(($row->y-$miny)/$scaley)+$margin,$text_color,$font,$row->regionname);
+    while ($row = $stmt->fetchObject()){
+        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin,(($row->y-$miny)/$scaley)+$margin,$text_color,$font,$row->regionname);
+    }
 }
-
 
 
 imagepng($im);
