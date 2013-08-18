@@ -133,7 +133,7 @@ $jumpsql="select mss1.x x1,mss1.z y1,mss2.x x2,mss2.z y2 from mapSolarSystemJump
 $stmt = $dbh->prepare($jumpsql." ".$whereclause);
 $stmt->execute();
 while ($row = $stmt->fetchObject()){
-imagelinethick($im,(($row->x1-$minx)/$scalex)+$margin,(($row->y1-$miny)/$scaley)+$margin,(($row->x2-$minx)/$scalex)+$margin,(($row->y2-$miny)/$scaley)+$margin,$line_color,1);
+imagelinethick($im,(($row->x1-$minx)/$scalex)+$margin,$y-((($row->y1-$miny)/$scaley)-$margin),(($row->x2-$minx)/$scalex)+$margin,$y-((($row->y2-$miny)/$scaley)-$margin),$line_color,1);
 }
 
 
@@ -164,10 +164,10 @@ while ($row = $stmt->fetchObject()){
         $starsize=$star['size'];
     }
 
-    imagefilledellipse($im,(($row->x-$minx)/$scalex)+$margin,(($row->y-$miny)/$scaley)+$margin,$starsize,$starsize,$color);
+    imagefilledellipse($im,(($row->x-$minx)/$scalex)+$margin,$y-((($row->y-$miny)/$scaley)-$margin),$starsize,$starsize,$color);
     if ($systemlabel)
     {
-        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin+5,(($row->y-$miny)/$scaley)+$margin-5,$startext_color,$font,$row->solarsystemname);
+        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin+5,$y-((($row->y-$miny)/$scaley)-$margin+5),$startext_color,$font,$row->solarsystemname);
     }
 }
 
@@ -180,7 +180,7 @@ if ($regionlabel)
     $stmt->execute(array(":minx"=>$minx,":miny"=>$miny,":maxx"=>$maxx,":maxy"=>$maxy));
 
     while ($row = $stmt->fetchObject()){
-        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin,(($row->y-$miny)/$scaley)+$margin,$regiontext_color,$font,$row->regionname);
+        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin,$y-((($row->y-$miny)/$scaley)-$margin),$regiontext_color,$font,$row->regionname);
     }
 }
 
