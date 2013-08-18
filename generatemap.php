@@ -66,15 +66,37 @@ if (isset($_SESSION['starjson']))
 
 $im = @imagecreatetruecolor($x+($margin*2), $y+($margin*2))
       or die('Cannot Initialize new GD image stream');
-$white_color = imagecolorallocate($im, 255, 255, 255);
-$black_color = imagecolorallocate($im, 0, 0, 0);
+$star_color = imagecolorallocate($im, 255, 255, 255);
+$background = imagecolorallocate($im, 0, 0, 0);
 $line_color = imagecolorallocate($im, 60, 60, 60);
-$text_color = imagecolorallocate($im, 90, 90, 255);
+$startext_color = imagecolorallocate($im, 90, 90, 255);
+$regiontext_color = imagecolorallocate($im, 90, 90, 255);
 $font='/usr/share/fonts/dejavu/DejaVuLGCSansMono.ttf';
-#imagealphablending($im, false);
-#imagesavealpha($im, true);
 
 
+if (isset($_SESSION['mapbackground']))
+{
+    $background=ImageColorAllocateFromHex($im,$_SESSION['mapbackground']);
+}
+if (isset($_SESSION['maplinecolor']))
+{
+    $line_color=ImageColorAllocateFromHex($im,$_SESSION['maplinecolor']);
+}
+if (isset($_SESSION['mapstarcolor']))
+{
+    $star_color=ImageColorAllocateFromHex($im,$_SESSION['mapstarcolor']);
+}
+if (isset($_SESSION['mapstartextcolor']))
+{
+    $startext_color=ImageColorAllocateFromHex($im,$_SESSION['mapstartextcolor']);
+}
+if (isset($_SESSION['mapregioncolor']))
+{
+    $regiontext_color=ImageColorAllocateFromHex($im,$_SESSION['mapregioncolor']);
+}
+
+
+imagefill($im,0,0,$background);
 
 
 $whereclause="";
@@ -103,7 +125,21 @@ $miny=$row->miny;
 
 $scalex=($maxx-$minx)/$x;
 $scaley=($maxy-$miny)/$y;
-$sql="select solarsystemid,solarsystemname,'255' r,'255' g,'255' b,x,z as y from eve.mapSolarSystems mss1 where security !=-0.99";
+
+
+
+
+$jumpsql="select mss1.x x1,mss1.z y1,mss2.x x2,mss2.z y2 from mapSolarSystemJumps mssj join  mapSolarSystems mss1 on mssj.fromSolarSystemID=mss1.solarSystemID join  mapSolarSystems mss2 on mssj.toSolarSystemID=mss2.solarSystemID";
+$stmt = $dbh->prepare($jumpsql." ".$whereclause);
+$stmt->execute();
+while ($row = $stmt->fetchObject()){
+imagelinethick($im,(($row->x1-$minx)/$scalex)+$margin,(($row->y1-$miny)/$scaley)+$margin,(($row->x2-$minx)/$scalex)+$margin,(($row->y2-$miny)/$scaley)+$margin,$line_color,1);
+}
+
+
+
+
+$sql="select solarsystemid,solarsystemname,x,z as y from eve.mapSolarSystems mss1 where security !=-0.99";
 
 $stmt = $dbh->prepare($sql." ".$whereclause);
 
@@ -112,14 +148,9 @@ $stmt->execute();
 $colors=array();
 
 while ($row = $stmt->fetchObject()){
-    if (!isset($colors[$row->r."#".$row->g."#".$row->b]))
-    {
-        $colors[$row->r."#".$row->g."#".$row->b]=imagecolorallocate($im,$row->r,$row->g,$row->b);
-    }
-
     $starsize=$basesize;
 
-    $color=$colors[$row->r."#".$row->g."#".$row->b];
+    $color=$star_color;
 
     if (isset($stars[$row->solarsystemid]))
     {
@@ -136,21 +167,10 @@ while ($row = $stmt->fetchObject()){
     imagefilledellipse($im,(($row->x-$minx)/$scalex)+$margin,(($row->y-$miny)/$scaley)+$margin,$starsize,$starsize,$color);
     if ($systemlabel)
     {
-        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin+5,(($row->y-$miny)/$scaley)+$margin-5,$text_color,$font,$row->solarsystemname);
+        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin+5,(($row->y-$miny)/$scaley)+$margin-5,$startext_color,$font,$row->solarsystemname);
     }
 }
 
-$jumpsql="select mss1.x x1,mss1.z y1,mss2.x x2,mss2.z y2 from mapSolarSystemJumps mssj join  mapSolarSystems mss1 on mssj.fromSolarSystemID=mss1.solarSystemID join  mapSolarSystems mss2 on mssj.toSolarSystemID=mss2.solarSystemID";
-
-$stmt = $dbh->prepare($jumpsql." ".$whereclause);
-
-$stmt->execute();
-
-while ($row = $stmt->fetchObject()){
-imagelinethick($im,(($row->x1-$minx)/$scalex)+$margin,(($row->y1-$miny)/$scaley)+$margin,(($row->x2-$minx)/$scalex)+$margin,(($row->y2-$miny)/$scaley)+$margin,$line_color,1);
-
-
-}
 
 if ($regionlabel)
 {
@@ -160,7 +180,7 @@ if ($regionlabel)
     $stmt->execute(array(":minx"=>$minx,":miny"=>$miny,":maxx"=>$maxx,":maxy"=>$maxy));
 
     while ($row = $stmt->fetchObject()){
-        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin,(($row->y-$miny)/$scaley)+$margin,$text_color,$font,$row->regionname);
+        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin,(($row->y-$miny)/$scaley)+$margin,$regiontext_color,$font,$row->regionname);
     }
 }
 
@@ -198,7 +218,16 @@ function imagelinethick($image, $x1, $y1, $x2, $y2, $color, $thick = 1)
 }
 
 
+function ImageColorAllocateFromHex ($img, $hexstr)
+{
+  $hexstr=trim($hexstr,'#');
+  $int = hexdec($hexstr);
 
+  return ImageColorAllocate ($img,
+         0xFF & ($int >> 0x10),
+         0xFF & ($int >> 0x8),
+         0xFF & $int);
+} 
 
 
 
