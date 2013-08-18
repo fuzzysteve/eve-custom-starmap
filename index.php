@@ -145,9 +145,12 @@ $(document).ready( function() {
   $('#regioncolor').spectrum({});
 });
 </script>
+<?php include('/home/web/fuzzwork/htdocs/menu/menuhead.php'); ?>
 </head>
 <body>
+<?php include('/home/web/fuzzwork/htdocs/menu/menu.php'); ?>
 <p>These maps are not stored, being generated from your session. Save them to your computer, then upload them to imgur or another host</p>
+<p> Get the source from <a href="https://github.com/fuzzysteve/eve-custom-starmap">https://github.com/fuzzysteve/eve-custom-starmap</a></p>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']?>">
 <table>
 <tr><td><label for='x'>X</label></td><td><input class="input" type=text id="x" name=x value=<?php echo $x; ?>></td><td></td></tr>
