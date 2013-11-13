@@ -1,4 +1,5 @@
 <?
+ini_set('memory_limit','800M');
 header('Content-Type: image/png');
 require_once('db.inc.php');
 
@@ -59,8 +60,28 @@ if (isset($_SESSION['starjson']))
     $stars=json_decode($_SESSION['starjson'],true);
 }
 
+$textsize=10;
+if (isset($_SESSION['textsize']))
+{
+    $textsize=$_SESSION['textsize'];
+}
 
+$regionsize=10;
+if (isset($_SESSION['regionsize']))
+{
+    $regionsize=$_SESSION['regionsize'];
+}
 
+$security=0;
+if (isset($_SESSION['security']))
+{
+    $security=$_SESSION['security'];
+}
+$font=0;
+if (isset($_SESSION['font']))
+{
+    $font=$_SESSION['font'];
+}
 
 
 
@@ -71,7 +92,13 @@ $background = imagecolorallocate($im, 0, 0, 0);
 $line_color = imagecolorallocate($im, 60, 60, 60);
 $startext_color = imagecolorallocate($im, 90, 90, 255);
 $regiontext_color = imagecolorallocate($im, 90, 90, 255);
-$font='/usr/share/fonts/dejavu/DejaVuLGCSansMono.ttf';
+
+
+$fontarray=array('/usr/share/fonts/dejavu/DejaVuLGCSansMono.ttf','/home/web/fuzzwork/htdocs/mapmaker/EveSansNeue-Bold.otf','/home/web/fuzzwork/htdocs/mapmaker/EveSansNeue-Regular.otf');
+
+
+#$font='/usr/share/fonts/dejavu/DejaVuLGCSansMono.ttf';
+$font=$fontarray[$font-1];
 
 
 if (isset($_SESSION['mapbackground']))
@@ -139,7 +166,7 @@ imagelinethick($im,(($row->x1-$minx)/$scalex)+$margin,$y-((($row->y1-$miny)/$sca
 
 
 
-$sql="select solarsystemid,solarsystemname,x,z as y from eve.mapSolarSystems mss1 where security !=-0.99";
+$sql="select solarsystemid,solarsystemname,x,z as y,red starred, green stargreen,blue starblue from eve.mapSolarSystems mss1 join evesupport.securitycolor on (round(mss1.security,1)=evesupport.securitycolor.level) where security !=-0.99";
 
 $stmt = $dbh->prepare($sql." ".$whereclause);
 
@@ -163,14 +190,24 @@ while ($row = $stmt->fetchObject()){
         $color=$colors[$star['r']."#".$star['g']."#".$star['b']];
         $starsize=$star['size'];
     }
-
+    if ($security)
+    {    
+         if (!isset($colors[$row->starred."#".$row->stargreen."#".$row->starblue]))
+         {
+            $colors[$row->starred."#".$row->stargreen."#".$row->starblue]=imagecolorallocate($im,$row->starred,$row->stargreen,$row->starblue);
+         }
+         $color=$colors[$row->starred."#".$row->stargreen."#".$row->starblue];
+    }
     imagefilledellipse($im,(($row->x-$minx)/$scalex)+$margin,$y-((($row->y-$miny)/$scaley)-$margin),$starsize,$starsize,$color);
-    if ($systemlabel)
-    {
-        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin+5,$y-((($row->y-$miny)/$scaley)-$margin+5),$startext_color,$font,$row->solarsystemname);
+}
+$stmt->execute();
+if ($systemlabel)
+{
+while ($row = $stmt->fetchObject())
+    {  
+        imagettftext($im, $textsize,0, (($row->x-$minx)/$scalex)+$margin+5,$y-((($row->y-$miny)/$scaley)-$margin+5),$startext_color,$font,$row->solarsystemname);
     }
 }
-
 
 if ($regionlabel)
 {
@@ -180,7 +217,7 @@ if ($regionlabel)
     $stmt->execute(array(":minx"=>$minx,":miny"=>$miny,":maxx"=>$maxx,":maxy"=>$maxy));
 
     while ($row = $stmt->fetchObject()){
-        imagettftext($im, 10,0, (($row->x-$minx)/$scalex)+$margin,$y-((($row->y-$miny)/$scaley)-$margin),$regiontext_color,$font,$row->regionname);
+        imagettftext($im, $regionsize,0, (($row->x-$minx)/$scalex)+$margin,$y-((($row->y-$miny)/$scaley)-$margin),$regiontext_color,$font,$row->regionname);
     }
 }
 
