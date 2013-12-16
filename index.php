@@ -17,6 +17,7 @@ $textsize=10;
 $regionsize=10;
 $linewidth=1;
 $font=1;
+$transparent=0;
 $startextcolor="#0000ff";
 $regiontextcolor="#0000ff";
 
@@ -24,12 +25,12 @@ if (isset($_POST['submit']))
 {
     session_start();
 
-    if (isset($_POST['x']) && is_numeric($_POST['x']) && $_POST['x']<=9000)
+    if (isset($_POST['x']) && is_numeric($_POST['x']) && $_POST['x']<=3000)
     {
         $x=$_POST['x'];
         $_SESSION['mapx']=$_POST['x'];
     }
-    if (isset($_POST['y']) && is_numeric($_POST['y']) && $_POST['y']<=9000)
+    if (isset($_POST['y']) && is_numeric($_POST['y']) && $_POST['y']<=3000)
     {
         $y=$_POST['y'];
         $_SESSION['mapy']=$_POST['y'];
@@ -84,8 +85,8 @@ if (isset($_POST['submit']))
         $stars=array();
         foreach(preg_split("/((\r?\n)|(\r\n?))/", $_POST['stars']) as $line){
              if (preg_match("/(\d+),(\d+),(\d+),(\d+),(\d+)/",$line,$matches)){
-                 list($total,$starid,$r,$b,$g,$size)=$matches;
-                 $stardisplay.="$starid,$r,$b,$g,$size\n";
+                 list($total,$starid,$r,$g,$b,$size)=$matches;
+                 $stardisplay.="$starid,$r,$g,$b,$size\n";
                  $stars[$starid]=array("r"=>$r,"g"=>$g,"b"=>$b,"size"=>$size);
              }
              $_SESSION['starjson']=json_encode($stars);
@@ -151,8 +152,26 @@ if (isset($_POST['submit']))
         $regiontextcolor=$_POST['regioncolor'];
         $_SESSION['mapregioncolor']=$regiontextcolor;
     }
-}
+    if (isset($_POST['transparent']) && is_numeric($_POST['transparent']))
+    {
+        $transparent=$_POST['transparent'];
+        if ($transparent)
+        {
+            $_SESSION['transparent']=127;
+        }
+        else
+        {
+            $_SESSION['transparent']=0;
+        }
 
+
+ 
+    }
+
+
+
+}
+echo $transparent;
 
 ?>
 
@@ -199,7 +218,7 @@ $(document).ready( function() {
 <tr><td>Color by Security Status</td><td><select name="security"><option value=0 <? if ($security==0){ echo "selected"; }?>>Off</option> <option value=1 <? if ($security==1){ echo "selected"; }?>>On</input></select></td><td></tr>
 <tr><td>Font</td><td><select name="font"><option value=1 <? if ($font==1){ echo "selected"; }?>>Font 1</option> <option value=2 <? if ($font==2){ echo "selected"; }?>>Font 2</input><option value=3 <? if ($font==3){ echo "selected"; }?>>Font 3</input></select></td><td></tr>
 <tr><td>Custom Highlights</td><td><textarea name="stars"><?echo $stardisplay; ?></textarea></td><td>starid,red,green,blue,size</td></tr>
-<tr><td>Background Colour</td><td><input type="text" id="background" name="background" value="<?php echo $bgcolor  ?>"></td><td></td></tr>
+<tr><td>Background Colour</td><td><input type="text" id="background" name="background" value="<?php echo $bgcolor  ?>"></td><td>Transparent<select name="transparent"><option value=0>no</option><option value=127 <? if ($transparent==127){ echo "selected"; }?>>yes</option></td></tr>
 <tr><td>Star Colour</td><td><input type="text" id="starcolor" name="starcolor" value="<?php echo $starcolor  ?>"></td><td></td></tr>
 <tr><td>Line Colour</td><td><input type="text" id="linecolor" name="linecolor" value="<?php echo $linecolor  ?>"></td><td></td></tr>
 <tr><td>Star Label Colour</td><td><input type="text" id="startextcolor" name="startextcolor" value="<?php echo $startextcolor  ?>"></td><td></td></tr>

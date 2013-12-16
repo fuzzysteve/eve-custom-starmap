@@ -83,12 +83,25 @@ if (isset($_SESSION['font']))
     $font=$_SESSION['font'];
 }
 
+$transparent=0;
+if (isset($_SESSION['transparent']))
+{
+$transparent=$_SESSION['transparent'];
+}
+
+
 
 
 $im = @imagecreatetruecolor($x+($margin*2), $y+($margin*2))
       or die('Cannot Initialize new GD image stream');
+
+if ($transparent)
+{
+imagealphablending($im, false);
+imagesavealpha($im, true);
+}
 $star_color = imagecolorallocate($im, 255, 255, 255);
-$background = imagecolorallocate($im, 0, 0, 0);
+$background = imagecolorallocatealpha($im, 0, 0, 0,$transparent);
 $line_color = imagecolorallocate($im, 60, 60, 60);
 $startext_color = imagecolorallocate($im, 90, 90, 255);
 $regiontext_color = imagecolorallocate($im, 90, 90, 255);
@@ -103,7 +116,7 @@ $font=$fontarray[$font-1];
 
 if (isset($_SESSION['mapbackground']))
 {
-    $background=ImageColorAllocateFromHex($im,$_SESSION['mapbackground']);
+    $background=ImageColorAllocateFromHex($im,$_SESSION['mapbackground'],$transparent);
 }
 if (isset($_SESSION['maplinecolor']))
 {
@@ -155,14 +168,15 @@ $scaley=($maxy-$miny)/$y;
 
 
 
-
+if ($linewidth>0)
+{
 $jumpsql="select mss1.x x1,mss1.z y1,mss2.x x2,mss2.z y2 from mapSolarSystemJumps mssj join  mapSolarSystems mss1 on mssj.fromSolarSystemID=mss1.solarSystemID join  mapSolarSystems mss2 on mssj.toSolarSystemID=mss2.solarSystemID";
 $stmt = $dbh->prepare($jumpsql." ".$whereclause);
 $stmt->execute();
 while ($row = $stmt->fetchObject()){
-imagelinethick($im,(($row->x1-$minx)/$scalex)+$margin,$y-((($row->y1-$miny)/$scaley)-$margin),(($row->x2-$minx)/$scalex)+$margin,$y-((($row->y2-$miny)/$scaley)-$margin),$line_color,1);
+imagelinethick($im,(($row->x1-$minx)/$scalex)+$margin,$y-((($row->y1-$miny)/$scaley)-$margin),(($row->x2-$minx)/$scalex)+$margin,$y-((($row->y2-$miny)/$scaley)-$margin),$line_color,$linewidth);
 }
-
+}
 
 
 
@@ -255,15 +269,15 @@ function imagelinethick($image, $x1, $y1, $x2, $y2, $color, $thick = 1)
 }
 
 
-function ImageColorAllocateFromHex ($img, $hexstr)
+function ImageColorAllocateFromHex ($img, $hexstr,$alpha=0)
 {
   $hexstr=trim($hexstr,'#');
   $int = hexdec($hexstr);
 
-  return ImageColorAllocate ($img,
+  return ImageColorAllocateAlpha ($img,
          0xFF & ($int >> 0x10),
          0xFF & ($int >> 0x8),
-         0xFF & $int);
+         0xFF & $int,$alpha);
 } 
 
 
