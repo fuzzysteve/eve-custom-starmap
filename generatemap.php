@@ -212,7 +212,7 @@ while ($row = $stmt->fetchObject()){
          }
          $color=$colors[$row->starred."#".$row->stargreen."#".$row->starblue];
     }
-    imagefilledellipse($im,(($row->x-$minx)/$scalex)+$margin,$y-((($row->y-$miny)/$scaley)-$margin),$starsize,$starsize,$color);
+    imagefilledellipse($im,(int)((($row->x-$minx)/$scalex)+$margin),(int)($y-((($row->y-$miny)/$scaley)-$margin)),$starsize,$starsize,$color);
 }
 $stmt->execute();
 if ($systemlabel)
@@ -237,7 +237,6 @@ if ($regionlabel)
 
 
 imagepng($im);
-imagedestroy($im);
 
 
 
@@ -250,7 +249,7 @@ function imagelinethick($image, $x1, $y1, $x2, $y2, $color, $thick = 1)
     return imageline($image, $x1, $y1, $x2, $y2, $color);
     */
     if ($thick == 1) {
-        return imageline($image, $x1, $y1, $x2, $y2, $color);
+        return imageline($image, (int)$x1, (int)$y1, (int)$x2, (int)$y2, $color);
     }
     $t = $thick / 2 - 0.5;
     if ($x1 == $x2 || $y1 == $y2) {
