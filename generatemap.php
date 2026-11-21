@@ -1,4 +1,5 @@
-<?
+<?php
+session_start();
 ini_set('memory_limit','800M');
 header('Content-Type: image/png');
 require_once('db.inc.php');
@@ -77,7 +78,7 @@ if (isset($_SESSION['security']))
 {
     $security=$_SESSION['security'];
 }
-$font=0;
+$font=1;
 if (isset($_SESSION['font']))
 {
     $font=$_SESSION['font'];
@@ -253,7 +254,7 @@ function imagelinethick($image, $x1, $y1, $x2, $y2, $color, $thick = 1)
     }
     $t = $thick / 2 - 0.5;
     if ($x1 == $x2 || $y1 == $y2) {
-        return imagefilledrectangle($image, round(min($x1, $x2) - $t), round(min($y1, $y2) - $t), round(max($x1, $x2) + $t), round(max($y1, $y2) + $t), $color);
+        return imagefilledrectangle($image, (int)round(min($x1, $x2) - $t), (int)round(min($y1, $y2) - $t), (int)round(max($x1, $x2) + $t), (int)round(max($y1, $y2) + $t), $color);
     }
     $k = ($y2 - $y1) / ($x2 - $x1); //y = kx + q
     $a = $t / sqrt(1 + pow($k, 2));

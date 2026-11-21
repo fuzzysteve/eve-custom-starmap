@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 $x=800;
 $y=800;
 $margin=20;
@@ -213,12 +213,12 @@ $(document).ready( function() {
 <tr><td><label for='margin'>Margin</label></td><td><input class="input" name=margin type=text id="margin" value=<?php echo $margin?>></td><td></td></tr>
 <tr><td><label for="region">Region</label></td><td><input  class="input" type=text id="region" name="region" value=<?php echo $region?>></td><td> Leave blank for no region restriction</td></tr>
 <tr><td><label for="constellation">Constellation</label></td><td><input class="input" type=text id="constellation" name=constellation value=<?php echo $constellation?>></td><td> Leave blank for no Constellation restriction</td></tr>
-<tr><td>System labels</td><td><select name="systemlabel"><option value=0 <? if ($systemlabel==0){ echo "selected"; }?>>Off</option> <option value=1 <? if ($systemlabel==1){ echo "selected"; }?>>On</input></select></td><td></tr>
-<tr><td>Region labels</td><td><select name="regionlabel"><option value=0 <? if ($regionlabel==0){ echo "selected"; }?>>Off</option> <option value=1 <? if ($regionlabel==1){ echo "selected"; }?>>On</input></select></td><td></tr>
-<tr><td>Color by Security Status</td><td><select name="security"><option value=0 <? if ($security==0){ echo "selected"; }?>>Off</option> <option value=1 <? if ($security==1){ echo "selected"; }?>>On</input></select></td><td></tr>
-<tr><td>Font</td><td><select name="font"><option value=1 <? if ($font==1){ echo "selected"; }?>>Font 1</option> <option value=2 <? if ($font==2){ echo "selected"; }?>>Font 2</input><option value=3 <? if ($font==3){ echo "selected"; }?>>Font 3</input></select></td><td></tr>
-<tr><td>Custom Highlights</td><td><textarea name="stars"><?echo $stardisplay; ?></textarea></td><td>starid,red,green,blue,size</td></tr>
-<tr><td>Background Colour</td><td><input type="text" id="background" name="background" value="<?php echo $bgcolor  ?>"></td><td>Transparent<select name="transparent"><option value=0>no</option><option value=127 <? if ($transparent==127){ echo "selected"; }?>>yes</option></td></tr>
+<tr><td>System labels</td><td><select name="systemlabel"><option value=0 <?php if ($systemlabel==0){ echo "selected"; }?>>Off</option> <option value=1 <?php if ($systemlabel==1){ echo "selected"; }?>>On</input></select></td><td></tr>
+<tr><td>Region labels</td><td><select name="regionlabel"><option value=0 <?php if ($regionlabel==0){ echo "selected"; }?>>Off</option> <option value=1 <?php if ($regionlabel==1){ echo "selected"; }?>>On</input></select></td><td></tr>
+<tr><td>Color by Security Status</td><td><select name="security"><option value=0 <?php if ($security==0){ echo "selected"; }?>>Off</option> <option value=1 <?php if ($security==1){ echo "selected"; }?>>On</input></select></td><td></tr>
+<tr><td>Font</td><td><select name="font"><option value=1 <?php if ($font==1){ echo "selected"; }?>>Font 1</option> <option value=2 <?php if ($font==2){ echo "selected"; }?>>Font 2</input><option value=3 <?php if ($font==3){ echo "selected"; }?>>Font 3</input></select></td><td></tr>
+<tr><td>Custom Highlights</td><td><textarea name="stars"><?php echo $stardisplay; ?></textarea></td><td>starid,red,green,blue,size</td></tr>
+<tr><td>Background Colour</td><td><input type="text" id="background" name="background" value="<?php echo $bgcolor  ?>"></td><td>Transparent<select name="transparent"><option value=0>no</option><option value=127 <?php if ($transparent==127){ echo "selected"; }?>>yes</option></td></tr>
 <tr><td>Star Colour</td><td><input type="text" id="starcolor" name="starcolor" value="<?php echo $starcolor  ?>"></td><td></td></tr>
 <tr><td>Line Colour</td><td><input type="text" id="linecolor" name="linecolor" value="<?php echo $linecolor  ?>"></td><td></td></tr>
 <tr><td>Star Label Colour</td><td><input type="text" id="startextcolor" name="startextcolor" value="<?php echo $startextcolor  ?>"></td><td></td></tr>
