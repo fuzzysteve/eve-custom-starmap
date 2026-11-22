@@ -108,7 +108,7 @@ $startext_color = imagecolorallocate($im, 90, 90, 255);
 $regiontext_color = imagecolorallocate($im, 90, 90, 255);
 
 
-$fontarray=array('/usr/share/fonts/dejavu/DejaVuLGCSansMono.ttf','/home/web/fuzzwork/htdocs/mapmaker/EveSansNeue-Bold.otf','/home/web/fuzzwork/htdocs/mapmaker/EveSansNeue-Regular.otf');
+$fontarray=array('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf','/home/web/fuzzwork/htdocs/mapmaker/EveSansNeue-Bold.otf','/home/web/fuzzwork/htdocs/mapmaker/EveSansNeue-Regular.otf');
 
 
 #$font='/usr/share/fonts/dejavu/DejaVuLGCSansMono.ttf';
@@ -220,7 +220,7 @@ if ($systemlabel)
 {
 while ($row = $stmt->fetchObject())
     {  
-        imagettftext($im, $textsize,0, (($row->x-$minx)/$scalex)+$margin+5,$y-((($row->y-$miny)/$scaley)-$margin+5),$startext_color,$font,$row->solarsystemname);
+        imagettftext($im, $textsize,0, (int)((($row->x-$minx)/$scalex)+$margin+5),(int)($y-((($row->y-$miny)/$scaley)-$margin+5)),$startext_color,$font,$row->solarsystemname);
     }
 }
 
@@ -232,7 +232,7 @@ if ($regionlabel)
     $stmt->execute(array(":minx"=>$minx,":miny"=>$miny,":maxx"=>$maxx,":maxy"=>$maxy));
 
     while ($row = $stmt->fetchObject()){
-        imagettftext($im, $regionsize,0, (($row->x-$minx)/$scalex)+$margin,$y-((($row->y-$miny)/$scaley)-$margin),$regiontext_color,$font,$row->regionname);
+        imagettftext($im, $regionsize,0, (int)((($row->x-$minx)/$scalex)+$margin),(int)($y-((($row->y-$miny)/$scaley)-$margin)),$regiontext_color,$font,$row->regionname);
     }
 }
 
